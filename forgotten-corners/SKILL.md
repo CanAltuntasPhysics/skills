@@ -78,7 +78,7 @@ Report structure:
 ## 🔴 Confirmed findings
 
 ### <Human-readable headline>
-<One- or two-sentence explanation in plain language>
+<One sentence stating what is wrong. Maximum two sentences if a second sentence adds critical context (e.g. "even though X exists"). Do NOT explain what the file does, what the user might want, or speculate on causes.>
 
 📁 `<relative/path/to/file>:<line>`
 
@@ -87,7 +87,7 @@ Report structure:
 ## 🟡 Questions for you
 
 ### <Human-readable question>
-<Why the agent cannot answer this from static code alone>
+<One sentence asking the question. Optionally one short sentence explaining why static analysis cannot answer it.>
 
 📁 `<relative/path/to/file>` (if applicable)
 
@@ -112,6 +112,7 @@ Do not paste the full report into chat.
 
 ## What this skill must NOT do
 
+- **Do not write long explanations.** One sentence per finding. A second sentence only if it adds critical context (like "the route already exists"). Do not narrate what the code does, what the user might intend, or what should be done about it — the user knows their own codebase.
 - **Do not ask about things that are visible in the code.** If a button has a working `onClick`, do not ask whether it works. The user expects the skill to filter signal from noise.
 - **Do not list more than three near-identical findings separately.** Group them.
 - **Do not flag design choices.** Colour, spacing, copywriting tone — out of scope. Only flag *forgottenness*, not taste.
