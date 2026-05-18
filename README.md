@@ -66,36 +66,47 @@ The skill walks 11 fixed categories:
 ```markdown
 # Forgotten Corners Audit — 18 May 2026
 
-**Scope:** Header & Footer
-**Mode:** full
+**Scope:** entire site
+**Mode:** quick
 
 ## 🔴 Confirmed findings
 
-### Every footer column link points to `#`
-All footer column links render as `<Link href="#">` even though
-the matching routes (`/about`, `/services`, `/contact`) exist.
+### Footer social icons point to bare domains
+The Instagram, Twitter, and LinkedIn buttons link to `https://instagram.com`,
+`https://twitter.com`, `https://linkedin.com` with no company handle.
 
-📁 `components/Footer.tsx:49`
+📁 `components/Footer.tsx:42`
 
-### Header social links are bare domain placeholders
-The utility bar links to `https://instagram.com`, `https://twitter.com`
-with no company handle.
+### Newsletter signup button has no onClick
+The "Subscribe" button is rendered and styled but has no handler attached.
 
-📁 `components/Header.tsx:74`
+📁 `components/NewsletterCTA.tsx:18`
+
+### Default Next.js title on three routes
+`/blog`, `/pricing`, and `/about` all still render the default
+"Create Next App" page title.
+
+📁 `app/blog/page.tsx`, `app/pricing/page.tsx`, `app/about/page.tsx`
+
+### Footer copyright reads © 2024
+Hardcoded year in footer instead of `{new Date().getFullYear()}`.
+
+📁 `components/Footer.tsx:67`
 
 ## 🟡 Questions for you
 
-### Is the fixed header expected to overlap page heroes?
-The header is `fixed top-0 z-50` and starts transparent until 20px of scroll.
-Pages with light-coloured heroes may render unreadable.
+### Is the contact form connected to a backend?
+The form posts to `/api/contact`, but that route file does not exist
+in the repo. Either the endpoint is hosted elsewhere or the form
+silently fails on submit.
 
-📁 `components/Header.tsx:62`
+📁 `components/ContactForm.tsx:23`
 
 ## Summary
 
-- 2 confirmed findings
+- 4 confirmed findings
 - 1 question
-- Suggested next step: wire footer links to real routes, then walk through the question.
+- Suggested next step: fix the confirmed findings, then verify the contact form endpoint.
 ```
 
 ### Design principles
