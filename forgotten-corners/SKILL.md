@@ -1,9 +1,9 @@
 ---
-name: forgotten-realms
-description: Find forgotten details in a frontend codebase — placeholder links, dead buttons, unconnected forms, z-index conflicts, leftover TODOs. Statically analyses Next.js/React code and produces a dated markdown report split into confirmed findings and questions for the user. Use when the user wants to audit a site for overlooked bugs, mentions "forgotten realms", or is preparing a frontend project for launch.
+name: forgotten-corners
+description: Find forgotten details in a frontend codebase — placeholder links, dead buttons, unconnected forms, z-index conflicts, leftover TODOs. Statically analyses Next.js/React code and produces a dated markdown report split into confirmed findings and questions for the user. Use when the user wants to audit a site for overlooked bugs, mentions "forgotten corners", or is preparing a frontend project for launch.
 ---
 
-# Forgotten Realms
+# Forgotten Corners
 
 Audit a frontend codebase for the small, easily-overlooked bugs that survive into production: placeholder social links, dead buttons, unconnected forms, layering conflicts, leftover TODOs, broken hrefs.
 
@@ -13,9 +13,9 @@ This skill does **static analysis only** — it reads the code, it does not run 
 
 The user may pass an argument to scope the audit:
 
-- `/forgotten-realms` — audit the entire site
-- `/forgotten-realms <page or component>` — audit a specific area (e.g. "About page", "footer", "checkout flow")
-- `/forgotten-realms --quick` — audit only the most commonly-forgotten categories (1, 2, 7, 9, 11 below)
+- `/forgotten-corners` — audit the entire site
+- `/forgotten-corners <page or component>` — audit a specific area (e.g. "About page", "footer", "checkout flow")
+- `/forgotten-corners --quick` — audit only the most commonly-forgotten categories (1, 2, 7, 9, 11 below)
 
 If the argument is ambiguous (e.g. "the form"), pick the most likely target from the codebase and state your assumption in the report. Do not interview the user.
 
@@ -65,12 +65,12 @@ Stop scanning a category once you have a clear picture — do not exhaustively l
 
 ### 3. Write the report
 
-Create the report at `docs/forgotten-realms/YYYY-MM-DD-HHMM.md` (create the directory if it does not exist). Use the local date and time.
+Create the report at `docs/forgotten-corners/YYYY-MM-DD-HHMM.md` (create the directory if it does not exist). Use the local date and time.
 
 Report structure:
 
 ```markdown
-# Forgotten Realms Audit — <human-readable date>
+# Forgotten Corners Audit — <human-readable date>
 
 **Scope:** <whole site | specific page/component>
 **Mode:** <full | quick>
@@ -124,7 +124,7 @@ End with one short question offering three options:
 
 > Want me to turn these into a to-do list, open issues in the tracker, or leave the report as-is?
 
-If the user picks **to-do list**, write a checklist file at `docs/forgotten-realms/YYYY-MM-DD-HHMM-todo.md` containing only the confirmed findings as `- [ ]` items, grouped by category. Skip the questions (they need human input first).
+If the user picks **to-do list**, write a checklist file at `docs/forgotten-corners/YYYY-MM-DD-HHMM-todo.md` containing only the confirmed findings as `- [ ]` items, grouped by category. Skip the questions (they need human input first).
 
 If the user picks **issues**, open one issue per confirmed finding in the project issue tracker, using the report's headlines as titles and the explanation + file reference as the body.
 
