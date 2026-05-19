@@ -116,10 +116,93 @@ silently fails on submit.
 - **One sentence per finding** — terse, scannable, no narration about what the file does or what you might want.
 - **No interview** — the skill uses the argument you passed (or its absence) and starts. It does not ask clarifying questions before running.
 
-### Contributing
+---
 
-Issues and pull requests welcome. If the skill misses a category of forgotten detail you keep running into, open an issue with an example — I'm happy to consider adding it.
+## client-doc
 
-### License
+Generate **client-facing documentation** for features, recent changes, or full project overviews. Translates technical work into the language a non-technical client understands. Produces both markdown and self-contained HTML (with inline SVG diagrams, tables, and timelines — no external dependencies, no CDN, the HTML file works offline).
+
+### When to use
+
+Use `client-doc` when you:
+
+- Need to **explain a feature** to a non-technical client (e.g. "explain the Stripe integration", "document the booking flow")
+- Have to send a **changelog or status update** to a client at the end of the week, sprint, or milestone
+- Want a **project overview document** to onboard a new stakeholder or to attach to a proposal
+- Are wrapping up a project and need a **deliverable document** that summarises what was built
+
+Do not use it for internal technical documentation, API references, or developer-facing docs — those need different skills like `doc-it`. This skill is specifically for translating engineering work into language that someone managing the project (but not building it) needs.
+
+### Install
+
+```bash
+npx skills add https://github.com/CanAltuntasPhysics/skills --skill client-doc
+```
+
+### Usage
+
+```
+/client-doc feature stripe checkout              # document one feature
+/client-doc changelog                             # last ~10 commits, this week
+/client-doc changelog --last-month                # broader window
+/client-doc overview                              # whole project at a high level
+
+# Flags
+/client-doc feature ... --quick                   # skip grilling, generate fast
+/client-doc feature ... --md                      # markdown only
+/client-doc feature ... --html                    # html only
+# (default outputs both)
+```
+
+The skill writes timestamped files to `docs/client/YYYY-MM-DD-<mode>.md` (and `.html`).
+
+### How it works
+
+**Grilling is on by default.** Before writing, the skill asks 2-4 focused, project-specific questions to understand your mental model — who the audience is, what to include, what to omit. The goal is not a survey; it's to make sure the document reflects your judgement, not a generic template. Add `--quick` to skip grilling when you already know what you want.
+
+**Translation rule.** Every technical term gets translated to client language, or omitted:
+
+| Technical | Client language |
+|---|---|
+| Added `POST /api/contacts` | Contact form messages are now saved |
+| Integrated Stripe webhook | Payment confirmations are processed automatically |
+| Migrated database to PostgreSQL | *(omit — internal change)* |
+| Set up next-auth with JWT | User login was added |
+| Fixed TypeScript errors | *(omit)* |
+| Server-rendered the listings page | The listings page now loads faster |
+
+When in doubt about whether to mention something, the skill omits it. A 3-page doc the client reads beats a 10-page doc they skim.
+
+**HTML output is self-contained.** No CDN dependencies. The file opens offline in any browser. It includes:
+
+- Cover page with project name and date
+- Anchor-linked table of contents
+- Inline SVG diagrams (user flows, timelines, architecture maps) generated for the specific document
+- Styled tables and callout boxes
+- Print stylesheet so the client can save as PDF
+- Optional light/dark toggle
+
+### Design principles
+
+- **The audience is never a developer.** Every word serves someone who cares about what the product does, not how it works.
+- **Grilling is project-specific.** The skill scans the codebase first, then asks about real things in your project, not hypothetical ones.
+- **When in doubt, omit.** Completeness is not the goal — usefulness is.
+- **One question at a time.** Grilling is a conversation, not a form.
+
+### Example modes
+
+**Feature doc** — covers a single feature end to end (overview, user journey, supported options, limitations).
+
+**Changelog** — summarises what changed in a date window. Filters out refactors, dependency bumps, type fixes; rephrases technical work into outcomes the client cares about.
+
+**Overview** — full project at a high level (site structure, integrations, user flows, admin features).
+
+---
+
+## Contributing
+
+Issues and pull requests welcome. If a skill misses a category, pattern, or use case you keep running into, open an issue with an example — happy to consider adding it.
+
+## License
 
 MIT
