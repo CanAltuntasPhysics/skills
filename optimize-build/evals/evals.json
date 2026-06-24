@@ -1,0 +1,51 @@
+{
+  "skill_name": "optimize-build",
+  "evals": [
+    {
+      "id": 0,
+      "name": "vite-spa-should-be-static",
+      "prompt": "Our marketing site deploys through Coolify with Nixpacks and the builds feel heavier than they should for what is basically a static React site. Can you look at the project and figure out how to make the build faster and lighter? The repo is in the current directory.",
+      "expected_output": "Classifies as small Vite/React SPA, recognizes there is no server runtime (only react-router client routing) and recommends static deployment (publish dir dist, no Node start command). Flags the bloated 'build': 'eslint . && tsc --noEmit && vite build' script and recommends separating lint/typecheck. Notes missing .dockerignore and unpinned Node/package manager. Produces the audit in the SKILL.md template format. STOPS and presents the plan for approval; does NOT edit files unprompted. Plan mentions creating a branch and opening a PR to main.",
+      "files": ["evals/fixtures/vite-spa"],
+      "assertions": [
+        {"text": "Classifies the project as a small Vite/React SPA"},
+        {"text": "Identifies it as static (no SSR/API/server) and recommends static deployment with publish dir 'dist' and no Node start command"},
+        {"text": "Flags the 'build' script that runs eslint and tsc, and recommends separating lint/typecheck from the deploy build without deleting them"},
+        {"text": "Notes the missing .dockerignore and the unpinned Node version / package manager"},
+        {"text": "Presents an audit roughly matching the SKILL.md template (classification, risks, quick wins, proposed changes, Coolify checklist)"},
+        {"text": "STOPS for approval and does NOT modify any project files before the user approves"},
+        {"text": "Plan states it will create a branch and open a PR to main once approved"}
+      ]
+    },
+    {
+      "id": 1,
+      "name": "nextjs-server-cache-and-heavy-deps",
+      "prompt": "next build on our Coolify deploy keeps blowing through memory and every push rebuilds everything from scratch even when only one file changed. it's a next.js app with a contacts api. can you optimize the nixpacks build? code's in this folder",
+      "expected_output": "Classifies as medium Next.js app, correctly identifies it DOES need a server runtime (Prisma-backed API route under app/api). Recommends a nixpacks.toml with explicit npm ci / build / start and cacheDirectories including /root/.npm and .next/cache + node_modules/.cache. Flags 'build': 'npm run lint && tsc --noEmit && next build' for separation. Reports sharp/prisma as heavy deps (prisma client needed at runtime; verify generation). Suggests pinning Node and packageManager. Adds .dockerignore. STOPS for approval before editing. Mentions branch + PR to main.",
+      "files": ["evals/fixtures/next-app"],
+      "assertions": [
+        {"text": "Classifies as a medium Next.js app and recognizes it needs a server runtime (Prisma-backed API route), keeping a Node start command"},
+        {"text": "Recommends a nixpacks.toml with explicit install/build/start and cacheDirectories including /root/.npm and .next/cache (plus node_modules/.cache)"},
+        {"text": "Flags the lint+typecheck-in-build script and recommends separating them from the deploy build"},
+        {"text": "Reports sharp and prisma as heavy dependencies (notes prisma client is needed at runtime / verify generation)"},
+        {"text": "Recommends pinning Node version and packageManager, and adding a .dockerignore"},
+        {"text": "STOPS for approval and does not edit files before approval; plan mentions branch + PR to main"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "turborepo-build-only-target-app",
+      "prompt": "We have a pnpm turborepo with a web app and an admin app. Our Coolify deployment for the web app is super slow and I'm pretty sure it's building the whole monorepo. How do we make it only build the web app and cache properly? Repo is here.",
+      "expected_output": "Detects pnpm Turborepo (turbo.json, pnpm-workspace.yaml, apps/web + apps/admin). Identifies that the deploy is likely building the whole repo and recommends scoping to the target app via NIXPACKS_TURBO_APP_NAME=@acme/web or 'pnpm turbo build --filter=@acme/web'. Recommends pnpm cache dir /root/.local/share/pnpm/store and corepack enable, plus .next/cache for the Next app. Flags playwright in web's dependencies as a heavy/test dep. Confirms the target app name rather than guessing silently. STOPS for approval; mentions branch + PR.",
+      "files": ["evals/fixtures/turbo-mono"],
+      "assertions": [
+        {"text": "Detects a pnpm Turborepo (turbo.json + pnpm-workspace.yaml + apps/web and apps/admin)"},
+        {"text": "Identifies that the whole monorepo is likely being built and recommends scoping to the web app via NIXPACKS_TURBO_APP_NAME or a turbo --filter command targeting @acme/web"},
+        {"text": "Recommends the pnpm store cache dir (/root/.local/share/pnpm/store) with corepack enable, plus .next/cache for the Next app"},
+        {"text": "Flags playwright in the web app's dependencies as a heavy/test-only dependency"},
+        {"text": "Confirms or surfaces the target app name rather than silently changing monorepo build commands"},
+        {"text": "STOPS for approval before editing; plan mentions creating a branch and opening a PR to main"}
+      ]
+    }
+  ]
+}

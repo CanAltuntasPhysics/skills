@@ -199,6 +199,67 @@ When in doubt about whether to mention something, the skill omits it. A 3-page d
 
 ---
 
+## optimize-build
+
+Audit and optimize a project's **Coolify + Nixpacks** deployment to make builds **faster on repeated runs, lighter on memory, and less likely to invalidate cache** — without changing application behavior or migrating to a Dockerfile unless truly necessary. Works across any project type: Vite/React SPAs, Astro static sites, Next.js apps, Express/Nest/Fastify servers, and Turborepo/Nx monorepos.
+
+The skill **always inspects and classifies the project first, presents a written audit, and waits for your approval before touching any file**. Once approved, it ships the changes on a new branch and opens a PR to `main`.
+
+### When to use
+
+Use `optimize-build` when you:
+
+- Have a Coolify/Nixpacks deploy whose **builds are slow, memory-heavy, or rebuild everything on every push**
+- Want explicit, cache-friendly `nixpacks.toml`, `.dockerignore`, and pinned Node/package-manager versions instead of relying on auto-detection
+- Suspect a **static site is being served through a Node runtime** it doesn't need
+- Run a **monorepo** and think the whole repo is being built to deploy one app
+- Want a **safe, plan-first audit** of your build before changing anything — no surprise edits
+
+Do not use it for application performance, bundle-size tuning inside the app, or non-Coolify CI pipelines — it's specifically about the Coolify + Nixpacks build/deploy path.
+
+### Install
+
+```bash
+npx skills add https://github.com/CanAltuntasPhysics/skills --skill optimize-build
+```
+
+### Usage
+
+```
+/optimize-build                                  # audit the current repo's Nixpacks build
+```
+
+The skill inspects the repo, then returns a **Nixpacks Optimization Audit** (classification, current risks, quick wins, proposed file changes, a Coolify manual checklist, and a "stay on Nixpacks vs. move to Dockerfile" verdict). It does **not** edit anything until you approve.
+
+### How it works
+
+**Plan first, never surprise.** Builds are load-bearing, so the skill follows a strict order: **inspect → classify → plan → get approval → implement.** It will not "just fix it," even for low-risk changes — you decide what ships.
+
+**Implements on a branch, opens a PR.** Once you approve (all of it or a subset), the skill creates a descriptive branch (e.g. `optimize-build/nixpacks-cache`), applies only the approved changes, commits with a conventional message, and opens a PR targeting `main` — with the audit and Coolify checklist in the PR body. Pass a different base or ask it to commit directly and it'll follow that instead.
+
+**Treats static apps as static.** An app that only emits static assets (`dist`/`build`/`out`) is recommended for static deployment with no Node start command. A real server runtime (SSR, API routes, Prisma-backed endpoints, websockets) keeps its start command.
+
+### What it checks
+
+- **Package manager & Node version** — pins `engines.node` and `packageManager`, verifies the lockfile matches the manager
+- **Build scripts** — flags `lint`/`typecheck` baked into the deploy `build` and recommends separating them (without deleting them)
+- **Static vs. server** — decides whether a Node runtime is actually needed
+- **`nixpacks.toml`** — explicit install/build/start phases, only when it improves predictability
+- **Cache directories** — npm (`/root/.npm`), pnpm (`/root/.local/share/pnpm/store`), Next.js (`.next/cache`, `node_modules/.cache`)
+- **`.dockerignore`** — trims the build context to reduce cache busts
+- **Monorepos** — scopes the build to one app via `NIXPACKS_TURBO_APP_NAME` / `NIXPACKS_NX_APP_NAME` or a `--filter` command
+- **Heavy dependencies** — reports sharp, prisma, playwright, puppeteer, cypress, bcrypt, etc. and where they belong (never auto-removes)
+- **Next.js specifics** — `output: 'standalone'`, build-time work, locales
+- **Coolify settings** — a manual checklist for the UI settings the agent can't see
+
+### Design principles
+
+- **Prefer small, reversible changes.** A two-line cache config beats a sweeping rewrite.
+- **Never change runtime behavior.** Optimization is invisible to users of the app.
+- **Dockerfile is a last resort** — proposed, never done silently, and only when the project is clearly too heavy for Nixpacks.
+
+---
+
 ## Contributing
 
 Issues and pull requests welcome. If a skill misses a category, pattern, or use case you keep running into, open an issue with an example — happy to consider adding it.
